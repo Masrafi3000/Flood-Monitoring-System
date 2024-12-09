@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flood Monitoring Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Flood Monitoring Dashboard</h1>
+        <div id="water-level" class="card">Loading Water Level...</div>
+        <div id="temperature" class="card">Loading Temperature...</div>
+        <div id="flow-rate" class="card">Loading Flow Rate...</div>
+        <div id="total-volume" class="card">Loading Total Volume...</div>
+        <div id="motion-state" class="card">Loading Motion State...</div>
+    </div>
+    <script>
+        const BLYNK_AUTH = 'Z7EEkokzEkUnip752SHPEV0aF_pAKcY4'; // Your Blynk Auth Token
+        const BLYNK_URL = `https://blynk.cloud/external/api/get`;
+
+        async function fetchData() {
+            try {
+                // Fetch data for each virtual pin
+                const waterLevel = await fetch(`${BLYNK_URL}?token=${BLYNK_AUTH}&V0`).then(res => res.json());
+                const temperature = await fetch(`${BLYNK_URL}?token=${BLYNK_AUTH}&V4`).then(res => res.json());
+                const flowRate = await fetch(`${BLYNK_URL}?token=${BLYNK_AUTH}&V6`).then(res => res.json());
+                const totalVolume = await fetch(`${BLYNK_URL}?token=${BLYNK_AUTH}&V7`).then(res => res.json());
+                const motionState = await fetch(`${BLYNK_URL}?token=${BLYNK_AUTH}&V5`).then(res => res.json());
+
+                // Update the dashboard with the received data
+                document.getElementById('water-level').innerHTML = `Water Level: ${waterLevel} cm`;
+                document.getElementById('temperature').innerHTML = `Temperature: ${temperature}°C`;
+                document.getElementById('flow-rate').innerHTML = `Flow Rate: ${flowRate} L/min`;
+                document.getElementById('total-volume').innerHTML = `Total Volume: ${totalVolume} L`;
+                document.getElementById('motion-state').innerHTML = `Motion State: ${motionState ? 'Motion Detected' : 'No Motion'}`;
+            } catch (error) {
+                // Handle errors if fetching fails
+                document.getElementById('water-level').innerHTML = 'Error loading data';
+                document.getElementById('temperature').innerHTML = 'Error loading data';
+                document.getElementById('flow-rate').innerHTML = 'Error loading data';
+                document.getElementById('total-volume').innerHTML = 'Error loading data';
+                document.getElementById('motion-state').innerHTML = 'Error loading data';
+            }
+        }
+
+        // Refresh data every 5 seconds
+        setInterval(fetchData, 5000); 
+        fetchData(); // Initial fetch
+    </script>
+</body>
+</html>
